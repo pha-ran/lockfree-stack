@@ -9,9 +9,11 @@ class lockfree_memory_pool final {};
 template <typename T>
 class lockfree_memory_pool<T, true> final
 {
-	using pointer_size = unsigned long long;
+	static_assert(alignof(T) <= 16, "alignof(T) > 16");
 
 public:
+	using pointer_size = unsigned long long;
+
 	static constexpr pointer_size _user_address_max = 0x00007ffffffeffff;
 	static constexpr pointer_size _user_address_mask = 0x00007fffffffffff;
 
@@ -131,9 +133,11 @@ private:
 template <typename T>
 class lockfree_memory_pool<T, false> final
 {
-	using pointer_size = unsigned long long;
+	static_assert(alignof(T) <= 16, "alignof(T) > 16");
 
 public:
+	using pointer_size = unsigned long long;
+
 	static constexpr pointer_size _user_address_max = 0x00007ffffffeffff;
 	static constexpr pointer_size _user_address_mask = 0x00007fffffffffff;
 

@@ -13,7 +13,7 @@
 #pragma comment(lib, "winmm.lib")
 
 #define THREAD_COUNT	4
-#define FOR_COUNT		10
+#define FOR_COUNT		10000
 
 bool start = 0;
 lockfree_stack<int> ls;
@@ -21,6 +21,7 @@ lockfree_stack<int> ls;
 unsigned __stdcall worker_func(void*)
 {
 	int worker_id = GetCurrentThreadId();
+	int out_data;
 
 	printf("[WORKER] %d\n", worker_id);
 
@@ -31,8 +32,12 @@ unsigned __stdcall worker_func(void*)
 		for (int i = 0; i < FOR_COUNT; ++i)
 			ls.push(worker_id);
 
+		Sleep(0);
+
 		for (int i = 0; i < FOR_COUNT; ++i)
-			ls.pop();
+			ls.pop(&out_data);
+
+		Sleep(0);
 
 		if (!start) break;
 	}
@@ -48,9 +53,8 @@ int wmain(void) noexcept
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	HANDLE handles[THREAD_COUNT];
-
 	timeBeginPeriod(1);
+	HANDLE handles[THREAD_COUNT];
 	for (int i = 0; i < THREAD_COUNT; ++i)
 		handles[i] = (HANDLE)_beginthreadex(nullptr, 0, worker_func, nullptr, 0, nullptr);
 	system("pause");
